@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y \
         libonig-dev \
         graphviz \
         wget \
+        nodejs \
+        npm \
 
     && docker-php-ext-configure gd \
     && docker-php-ext-install -j$(nproc) gd \
