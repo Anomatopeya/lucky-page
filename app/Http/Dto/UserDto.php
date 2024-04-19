@@ -4,20 +4,20 @@ namespace App\Http\Dto;
 
 class UserDto
 {
-    private string $username;
+    private string $name;
     private int $phone;
     private ?int $id;
 
     public function __construct(string $username, int $phone, ?int $id = null)
     {
-        $this->username = $username;
+        $this->name = $username;
         $this->phone = $phone;
         $this->id = $id;
     }
 
-    public function getUsername(): string
+    public function getName(): string
     {
-        return $this->username;
+        return $this->name;
     }
 
     public function getPhone(): int

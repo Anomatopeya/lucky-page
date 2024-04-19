@@ -13,7 +13,7 @@ class RegistrationController extends Controller
     public function __invoke(RegistrationRequest $request, RegistrationService $service, AccessLinkService $accessLinkService)
     {
         $user = $service->createNewUser($request->getDto());
-        $linkDto = new UserLinkDto($user->id, $accessLinkService->generateToken(), Carbon::now()->addDays(config('app.link_expiration')));
+        $linkDto = new UserLinkDto($user->id, generateRandomToken(), Carbon::now()->addDays(config('app.link_expiration')));
         $token = $accessLinkService->saveAccessLink($linkDto);
         return view('registration.success', ['token' => $token]);
     }

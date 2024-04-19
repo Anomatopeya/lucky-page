@@ -16,10 +16,8 @@ class EloquentUserLinkRepository implements UserLinkRepositoryInterface
 
     public function findActive(string $token)
     {
-        return UserLink::where([
-            'token', $token,
-            'expires_at', '>', now()
-        ])
+        return UserLink::where('token', $token)
+            ->where('expires_at', '>', now())
             ->firstOrFail();
     }
 

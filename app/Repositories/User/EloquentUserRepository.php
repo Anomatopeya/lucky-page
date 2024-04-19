@@ -23,7 +23,7 @@ class EloquentUserRepository implements UserRepositoryInterface
     public function create(UserDto $dto): User
     {
         return User::create([
-            'name' => $dto->getUsername(),
+            'name' => $dto->getName(),
             'phone' => $dto->getPhone(),
         ]);
     }
@@ -36,7 +36,7 @@ class EloquentUserRepository implements UserRepositoryInterface
     public function update(User $user, UserDto $dto): bool
     {
         return $user->update([
-            'name' => $dto->getUsername(),
+            'name' => $dto->getName(),
             'phone' => $dto->getPhone(),
         ]);
     }
