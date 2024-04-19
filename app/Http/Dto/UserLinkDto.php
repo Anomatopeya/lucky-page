@@ -19,16 +19,25 @@ class UserLinkDto
         $this->expiredAt = $expiredAt;
     }
 
+    /**
+     * @return int
+     */
     public function getUserId(): int
     {
         return $this->userId;
     }
 
+    /**
+     * @return string
+     */
     public function getToken(): string
     {
         return $this->token;
     }
 
+    /**
+     * @return Carbon
+     */
     public function getExpiredAt(): Carbon
     {
         return $this->expiredAt;

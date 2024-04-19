@@ -8,19 +8,30 @@ use App\Models\UserLink;
 class EloquentUserLinkRepository implements UserLinkRepositoryInterface
 {
 
-    public function find(string $token)
+    /**
+     * @param string $token
+     * @return UserLink
+     */
+    public function find(string $token): UserLink
     {
         return UserLink::whereToken($token)->firstOrFail();
     }
 
-
-    public function findActive(string $token)
+    /**
+     * @param string $token
+     * @return UserLink
+     */
+    public function findActive(string $token): UserLink
     {
         return UserLink::where('token', $token)
             ->where('expires_at', '>', now())
             ->firstOrFail();
     }
 
+    /**
+     * @param UserLinkDto $dto
+     * @return string
+     */
     public function create(UserLinkDto $dto): string
     {
         return UserLink::create([
@@ -30,12 +41,20 @@ class EloquentUserLinkRepository implements UserLinkRepositoryInterface
         ])->token;
     }
 
-    public function delete(string $token)
+    /**
+     * @param string $token
+     * @return int
+     */
+    public function delete(string $token): int
     {
         return UserLink::whereToken($token)->delete();
     }
 
-    public function deactivate(string $token)
+    /**
+     * @param string $token
+     * @return int
+     */
+    public function deactivate(string $token): int
     {
         return UserLink::whereToken($token)->update(['expires_at' => now()]);
     }

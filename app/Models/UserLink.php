@@ -6,14 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int $user_id
  * @property string $token
- * @property string $expires_at
+ * @property \Illuminate\Support\Carbon $expires_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Database\Factories\UserLinkFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|UserLink newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|UserLink newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|UserLink query()
@@ -30,5 +31,8 @@ class UserLink extends Model
     use HasFactory;
 
     protected $fillable = ['user_id', 'token', 'expires_at'];
+    protected $casts = [
+        'expires_at' => 'datetime',
+    ];
 
 }

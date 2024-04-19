@@ -15,16 +15,25 @@ class UserDto
         $this->id = $id;
     }
 
+    /**
+     * @return string
+     */
     public function getName(): string
     {
         return $this->name;
     }
 
+    /**
+     * @return int
+     */
     public function getPhone(): int
     {
         return $this->phone;
     }
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;

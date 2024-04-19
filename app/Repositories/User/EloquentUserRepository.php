@@ -43,9 +43,9 @@ class EloquentUserRepository implements UserRepositoryInterface
 
     /**
      * @param User $user
-     * @return bool|null
+     * @return bool
      */
-    public function delete(User $user): ?bool
+    public function delete(User $user): bool
     {
         return $user->delete();
     }
