@@ -123,4 +123,12 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+
+    /*
+   |--------------------------------------------------------------------------
+   | Days to keep the link active
+   |--------------------------------------------------------------------------
+   */
+    'link_expiration' => env('APP_LINK_EXPIRATION', 7),
+
 ];
