@@ -129,6 +129,6 @@ return [
    | Days to keep the link active
    |--------------------------------------------------------------------------
    */
-    'link_expiration' => env('APP_LINK_EXPIRATION', 7),
+    'link_expiration' => (int)env('APP_LINK_EXPIRATION', 7),
 
 ];

@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\UserLink;
 use App\Repositories\User\EloquentUserLinkRepository;
 use App\Repositories\User\EloquentUserRepository;
 use App\Repositories\User\UserLinkRepositoryInterface;
 use App\Repositories\User\UserRepositoryInterface;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -31,6 +33,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Route::bind('token', function ($value) {
+            return UserLink::where('token', $value)->firstOrFail();
+        });
     }
 }
