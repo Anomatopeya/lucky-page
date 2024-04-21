@@ -35,7 +35,7 @@ class GameService
 
     private function getGameScore(): int
     {
-        return rand(1, 1000);
+        return rand(config('app.game.min_score',1), config('app.game.max_score',1000));
     }
 
     private function isWinGame(int $gameScore): bool
@@ -45,18 +45,12 @@ class GameService
 
     private function calculateWinAmount(int $gameScore): float
     {
-        if ($gameScore > 900) {
-            return round($gameScore * 0.7);
+        $conditions = config('app.victory_conditions', []);
+        foreach ($conditions as $condition) {
+            if ($gameScore > $condition['score']) {
+                return round($gameScore * $condition['multiplier']);
+            }
         }
-
-        if ($gameScore > 600) {
-            return round($gameScore * 0.5);
-        }
-
-        if ($gameScore > 300) {
-            return round($gameScore * 0.3);
-        }
-
-        return round($gameScore * 0.1);
+        return 0;
     }
 }

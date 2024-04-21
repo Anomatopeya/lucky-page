@@ -1,7 +1,5 @@
-# Використовуємо офіційний образ PHP 8.0
 FROM php:8.3-fpm
 
-# Встановлюємо PHP розширення та залежності
 RUN apt-get update && apt-get install -y \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
@@ -26,8 +24,6 @@ RUN apt-get update && apt-get install -y \
     && curl -sS https://getcomposer.org/installer | php -- \
      --install-dir=/usr/local/bin --filename=composer
 
-# Переключаємо робочу директорію
 WORKDIR /var/www
 
-# Додаємо глобальну змінну PATH для користувача "root"
 RUN echo "export PATH=\"\$HOME/.composer/vendor/bin:\$PATH\"" >> /root/.bashrc
