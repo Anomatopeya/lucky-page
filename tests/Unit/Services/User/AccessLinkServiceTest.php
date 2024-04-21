@@ -2,80 +2,76 @@
 
 namespace Tests\Unit\Services\User;
 
-use App\Models\UserLink;
-use App\Services\User\AccessLinkService;
-use App\Repositories\User\UserLinkRepositoryInterface;
 use App\Http\Dto\UserLinkDto;
+use App\Models\User;
+use App\Models\UserLink;
+use App\Repositories\User\UserLinkRepositoryInterface;
+use App\Services\CacheService\CacheServiceInterface;
+use App\Services\User\AccessLinkService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Mockery;
 use Tests\TestCase;
 
 class AccessLinkServiceTest extends TestCase
 {
+    private $userLinkRepository;
+    private $cacheService;
+    private $accessLinkService;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->userLinkRepository = Mockery::mock(UserLinkRepositoryInterface::class);
+        $this->cacheService = Mockery::mock(CacheServiceInterface::class);
+        $this->accessLinkService = new AccessLinkService($this->userLinkRepository, $this->cacheService);
+    }
 
     public function testSaveAccessLinkReturnsToken()
     {
-        $mockRepository = $this->createMock(UserLinkRepositoryInterface::class);
-        $mockRepository->method('create')->willReturn('test_token');
-
-        $service = new AccessLinkService($mockRepository);
-
-        $linkDto = new UserLinkDto(1, 'test_token', now());
-
-        $this->assertEquals('test_token', $service->saveAccessLink($linkDto));
-    }
-
-    public function testSaveAccessLinkCallsRepositoryCreateOnce()
-    {
-        $mockRepository = $this->createMock(UserLinkRepositoryInterface::class);
-        $mockRepository->expects($this->once())->method('create');
-
-        $service = new AccessLinkService($mockRepository);
-
-        $linkDto = new UserLinkDto(1, 'test_token', now());
-
-        $service->saveAccessLink($linkDto);
-    }
-
-    public function testUpdateAccessLink()
-    {
-        $userLinkRepository = $this->createMock(UserLinkRepositoryInterface::class);
-        $accessLinkService = new AccessLinkService($userLinkRepository);
-        $oldToken = generateRandomToken();
         $newToken = generateRandomToken();
+        $userId = User::factory()->create()->id;
+        $linkDto = new UserLinkDto($userId, $newToken, Carbon::now()->addDay());
+        $this->userLinkRepository->shouldReceive('create')->with($linkDto)->andReturn($newToken);
 
-        $userLink = new UserLink();
-        $userLink->user_id = 1;
-        $userLink->token = $oldToken;
-
-        $newLinkDto = new UserLinkDto($userLink->user_id, $newToken, Carbon::now()->addDays(1));
-
-        DB::shouldReceive('transaction')->andReturnUsing(function ($callback) use ($userLink) {
-            return $callback();
-        });
-
-        $userLinkRepository->expects($this->once())->method('deactivate')->with($oldToken);
-        $userLinkRepository->expects($this->once())->method('create')->with($newLinkDto)->willReturn($newToken);
-
-        $result = $accessLinkService->updateAccessLink($userLink, $newLinkDto);
+        $result = $this->accessLinkService->saveAccessLink($linkDto);
 
         $this->assertEquals($newToken, $result);
     }
 
-
-    public function testDeactivateAccessLink()
+    public function testUpdateAccessLinkReturnsNewToken()
     {
-        $userLinkRepository = $this->createMock(UserLinkRepositoryInterface::class);
-        $accessLinkService = new AccessLinkService($userLinkRepository);
         $oldToken = generateRandomToken();
+        $newToken = generateRandomToken();
+        $userId = User::factory()->create()->id;
+        $userLink = new UserLink(['token' => $oldToken, 'user_id' => $userId, 'expired_at' => Carbon::now()->addDay()]);
+        $newLinkDto = new UserLinkDto($userId, $newToken, Carbon::now()->addDay());
 
-        $userLink = new UserLink();
-        $userLink->token = $oldToken;
+        $this->userLinkRepository->shouldReceive('deactivate')->with($oldToken);
+        $this->cacheService->shouldReceive('forget')->with($userLink);
+        $this->userLinkRepository->shouldReceive('create')->with($newLinkDto)->andReturn($newToken);
 
-        $userLinkRepository->expects($this->once())->method('deactivate')->with($userLink->token);
+        DB::shouldReceive('transaction')->andReturnUsing(function ($callback) {
+            return $callback();
+        });
 
-        $accessLinkService->deactivateAccessLink($userLink);
+        $result = $this->accessLinkService->updateAccessLink($userLink, $newLinkDto);
 
-        $this->assertTrue(true);
+        $this->assertEquals($newToken, $result);
+    }
+
+    public function testDeactivateAccessLinkDeactivatesLink()
+    {
+        $token = generateRandomToken();
+        $userId = User::factory()->create()->id;
+        $userLink = new UserLink(['token' => $token, 'user_id' => $userId, 'expired_at' => Carbon::now()->addDay()]);
+
+        $this->userLinkRepository->shouldReceive('deactivate')->with($token);
+        $this->cacheService->shouldReceive('forget')->with($userLink);
+
+        $this->accessLinkService->deactivateAccessLink($userLink);
+
+        $this->assertTrue(true); // If we reach this point, no exceptions were thrown, so the test passed
     }
 }

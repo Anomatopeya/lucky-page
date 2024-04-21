@@ -4,18 +4,21 @@ namespace App\Services\User;
 use App\Http\Dto\UserLinkDto;
 use App\Models\UserLink;
 use App\Repositories\User\UserLinkRepositoryInterface;
+use App\Services\CacheService\CacheServiceInterface;
 use Illuminate\Support\Facades\DB;
 
 class AccessLinkService
 {
     protected UserLinkRepositoryInterface $userLinkRepository;
+    protected CacheServiceInterface $cacheService;
 
     /**
      * @param UserLinkRepositoryInterface $userLinkRepository
      */
-    public function __construct(UserLinkRepositoryInterface $userLinkRepository)
+    public function __construct(UserLinkRepositoryInterface $userLinkRepository, CacheServiceInterface $cacheService)
     {
         $this->userLinkRepository = $userLinkRepository;
+        $this->cacheService = $cacheService;
     }
 
     /**
@@ -38,6 +41,7 @@ class AccessLinkService
     {
         return DB::transaction(function () use ($userLink, $newLinkDto) {
             $this->userLinkRepository->deactivate($userLink->token);
+            $this->cacheService->forget($userLink);
             return $this->userLinkRepository->create($newLinkDto);
         });
     }
@@ -49,6 +53,7 @@ class AccessLinkService
     public function deactivateAccessLink(UserLink $userLink): void
     {
         $this->userLinkRepository->deactivate($userLink->token);
+        $this->cacheService->forget($userLink);
     }
 
 }
