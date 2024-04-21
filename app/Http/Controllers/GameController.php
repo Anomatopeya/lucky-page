@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Dto\UserLinkDto;
 use App\Models\UserLink;
+use App\Services\Game\GameService;
 use App\Services\User\AccessLinkService;
 use Carbon\Carbon;
 
@@ -38,5 +39,16 @@ class GameController extends Controller
         $accessLinkService->deactivateAccessLink($userLink);
 
         return json_encode(['url' => route('homepage')]);
+    }
+
+    public function playGame(UserLink $userLink, GameService $gameService)
+    {
+        $gameResult = $gameService->playGame();
+
+        return json_encode([
+            'score' => $gameResult->getScore(),
+            'isWin' => $gameResult->isWin(),
+            'winAmount' => $gameResult->getWinAmount(),
+        ]);
     }
 }

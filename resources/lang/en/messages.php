@@ -13,4 +13,10 @@ return [
     'generate_new_link_alert_text' => 'You are about to generate a new link. Are you sure?',
     'deactivate_link' => 'Deactivate link',
     'deactivate_link_alert_text' => 'You are about to deactivate link. Are you sure?',
+    'im_feeling_lucky' => 'I’m feeling lucky',
+    'history' => 'History',
+    'you_win' => 'You win!',
+    'you_lose' => 'Sorry, you lose',
+    'game_score' => 'Score: :score',
+    'win_amount' => 'Win amount: :amount',
 ];
