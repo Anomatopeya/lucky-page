@@ -22,6 +22,7 @@
     const historyResults = document.getElementById('historyResults');
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     let history = [];
+    let historyDBLoaded = false;
 
     function playGame(button) {
         axios.get(button.dataset.url, {
@@ -42,7 +43,6 @@
             historyResults.classList.add('hidden');
             history.unshift(data);
             if (history.length > 3) history.pop();
-            console.log(history)
         })
         .catch(function (error) {
             console.error('Request failed:', error);
@@ -50,27 +50,35 @@
     }
 
     function getHistory(button) {
-        historyResults.innerHTML = history.map(h => `
+
+        if (historyDBLoaded) {
+            displayHistory(history);
+        } else {
+            axios.get(button.dataset.url, {
+            }, {
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(function (response) {
+                displayHistory(response.data)
+                history = response.data;
+                historyDBLoaded = true;
+            })
+            .catch(function (error) {
+                console.error('Request failed:', error);
+            });
+        }
+
+        function displayHistory(history) {
+            historyResults.innerHTML = history.map(h => `
             <p>${h.isWin ? "Win!" : "Lose."} ${"Score: " + h.score}
             ${h.isWin ? `${"Win amount: " + h.winAmount}` : ''}
             `).join('');
-        luckyResult.classList.add('hidden');
-        historyResults.classList.remove('hidden');
-
-        // axios.get(button.dataset.url, {
-        // }, {
-        //     headers: {
-        //         'X-CSRF-TOKEN': csrfToken,
-        //         'Content-Type': 'application/json'
-        //     }
-        // })
-        //     .then(function (response) {
-        //         luckyResult.innerHTML = response.data;
-        //         luckyResult.classList.remove('hidden');
-        //     })
-        //     .catch(function (error) {
-        //         console.error('Request failed:', error);
-        //     });
+            luckyResult.classList.add('hidden');
+            historyResults.classList.remove('hidden');
+        }
     }
 
 </script>

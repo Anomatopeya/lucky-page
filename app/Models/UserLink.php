@@ -5,9 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -15,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon $expires_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\GameResult> $gameScores
+ * @property-read int|null $game_scores_count
  * @property-read \App\Models\User $user
  * @method static \Database\Factories\UserLinkFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|UserLink newModelQuery()
@@ -48,6 +51,12 @@ class UserLink extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function gameScores(): HasManyThrough
+    {
+        return $this->hasManyThrough(GameResult::class, User::class, 'id', 'user_id', 'user_id', 'id')
+            ->latest();
     }
 
 }

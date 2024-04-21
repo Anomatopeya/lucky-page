@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Dto\UserLinkDto;
+use App\Http\Resources\GameResultResource;
+use App\Models\GameResult;
 use App\Models\UserLink;
 use App\Services\Game\GameService;
 use App\Services\User\AccessLinkService;
@@ -44,11 +46,18 @@ class GameController extends Controller
     public function playGame(UserLink $userLink, GameService $gameService)
     {
         $gameResult = $gameService->playGame();
+        $gameService->saveResult($userLink->user_id, $gameResult);
 
-        return json_encode([
+        return GameResultResource::make(new GameResult([
             'score' => $gameResult->getScore(),
-            'isWin' => $gameResult->isWin(),
-            'winAmount' => $gameResult->getWinAmount(),
-        ]);
+            'is_win' => $gameResult->isWin(),
+            'win_amount' => $gameResult->getWinAmount(),
+            'user_id' => $userLink->user_id,
+        ]));
+    }
+
+    public function history(UserLink $userLink, GameService $gameService)
+    {
+        return GameResultResource::collection($gameService->getGameResults($userLink->user_id));
     }
 }

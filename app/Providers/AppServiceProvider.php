@@ -3,10 +3,13 @@
 namespace App\Providers;
 
 use App\Models\UserLink;
+use App\Repositories\Game\EloquentGameResultRepository;
+use App\Repositories\Game\GameResultRepositoryInterface;
 use App\Repositories\User\EloquentUserLinkRepository;
 use App\Repositories\User\EloquentUserRepository;
 use App\Repositories\User\UserLinkRepositoryInterface;
 use App\Repositories\User\UserRepositoryInterface;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -26,6 +29,11 @@ class AppServiceProvider extends ServiceProvider
             UserLinkRepositoryInterface::class,
             EloquentUserLinkRepository::class
         );
+
+        $this->app->bind(
+            GameResultRepositoryInterface::class,
+            EloquentGameResultRepository::class
+        );
     }
 
     /**
@@ -36,5 +44,7 @@ class AppServiceProvider extends ServiceProvider
         Route::bind('token', function ($value) {
             return UserLink::where('token', $value)->firstOrFail();
         });
+
+        JsonResource::withoutWrapping();
     }
 }
