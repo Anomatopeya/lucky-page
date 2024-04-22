@@ -11,6 +11,8 @@ init-app: ## init php app
 	docker-compose run --rm app php artisan db:seed
 	docker-compose run --rm app php artisan config:clear
 	docker-compose run --rm app php artisan cache:clear
+	docker-compose run --rm npm install
+	docker-compose run --rm npm run build
 
 down: ## down project
 	docker-compose down
